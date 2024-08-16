@@ -2,6 +2,7 @@ import asyncio
 import random
 
 """
+    Task 0
 """
 
 async def wait_random(max_delay: int = 10) -> float:

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-This module provides a helper function for calculating the range of indices
-for pagination purposes.
+This module provides a helper function for calculating the range of indices for pagination purposes.
 """
 
 

@@ -81,7 +81,7 @@ class Server:
         total_items = len(self.dataset())
         total_pages = math.ceil(total_items / page_size)
 
-        hypermedia = {
+        return {
             'page_size': len(data),
             'page': page,
             'data': data,
@@ -90,4 +90,3 @@ class Server:
             'total_pages': total_pages
         }
 
-        return hypermedia

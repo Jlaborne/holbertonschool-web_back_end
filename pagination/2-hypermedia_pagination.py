@@ -3,6 +3,7 @@
 Simple pagination module.
 This module provides functionality to paginate a dataset of popular baby names.
 """
+
 import csv
 import math
 from typing import List, Dict, Any, Tuple
@@ -26,8 +27,8 @@ def index_range(page: int, page_size: int) -> Tuple[int, int]:
 
 
 class Server:
-    """Server class to paginate a database of popular baby names.
-    """
+    """Server class to paginate a database of popular baby names."""
+
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
@@ -45,7 +46,7 @@ class Server:
             with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
                 dataset = [row for row in reader]
-            self.__dataset = dataset[1:]
+            self.__dataset = dataset[1:]  # Skip header row
 
         return self.__dataset
 

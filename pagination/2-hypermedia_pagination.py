@@ -3,7 +3,6 @@
 Simple pagination module.
 This module provides functionality to paginate a dataset of popular baby names.
 """
-
 import csv
 import math
 from typing import List, Dict, Any, Tuple
@@ -92,7 +91,7 @@ class Server:
             'page_size': len(data),
             'page': page,
             'data': data,
-            'next_page': page + 1 if page * page_size < total_items else None,
+            'next_page': page + 1 if page < total_pages else None,
             'prev_page': page - 1 if page > 1 else None,
             'total_pages': total_pages
         }

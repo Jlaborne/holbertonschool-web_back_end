@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
 Simple pagination module.
+This module provides functionality to paginate a dataset of popular baby names.
 """
 import csv
 import math
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 
-def index_range(page: int, page_size: int) -> tuple:
+def index_range(page: int, page_size: int) -> Tuple[int, int]:
     """
     Calculate the start and end indices for a given page and page size.
 

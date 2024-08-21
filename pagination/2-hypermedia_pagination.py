@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple pagination module.
-This module provides functionality to paginate a dataset of popular baby names.
+Hypermedia pagination module.
 """
 import csv
 import math
@@ -17,8 +16,8 @@ def index_range(page: int, page_size: int) -> Tuple[int, int]:
         page_size (int): The number of items per page.
 
     Returns:
-        tuple: A tuple containing the start index and end index for the
-               items to be displayed on the given page.
+        Tuple[int, int]: A tuple containing the start index and end index
+                         for the items to be displayed on the given page.
     """
     start_index = (page - 1) * page_size
     end_index = page * page_size
@@ -26,7 +25,7 @@ def index_range(page: int, page_size: int) -> Tuple[int, int]:
 
 
 class Server:
-    """Server class to paginate a database of popular baby names."""
+    """Server class to paginate a dataset of popular baby names."""
 
     DATA_FILE = "Popular_Baby_Names.csv"
 
@@ -83,15 +82,29 @@ class Server:
             Dict[str, Any]: A dictionary containing the pagination details
                             and the data for the current page.
         """
+        # Ensure page_size is not zero
+        if page_size <= 0:
+            raise ValueError("page_size must be greater than 0")
+
+        # Get the data for the current page
         data = self.get_page(page, page_size)
         total_items = len(self.dataset())
-        total_pages = math.ceil(total_items / page_size)
+
+        # Calculate the total number of pages
+        if page_size > 0:
+            total_pages = math.ceil(total_items / page_size)
+        else:
+            total_pages = 0
+
+        # Determine next and previous pages
+        next_page = page + 1 if page < total_pages else None
+        prev_page = page - 1 if page > 1 else None
 
         return {
             'page_size': len(data),
             'page': page,
             'data': data,
-            'next_page': page + 1 if page < total_pages else None,
-            'prev_page': page - 1 if page > 1 else None,
+            'next_page': next_page,
+            'prev_page': prev_page,
             'total_pages': total_pages
         }

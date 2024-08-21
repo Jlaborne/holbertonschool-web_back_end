@@ -35,7 +35,11 @@ class Server:
         self.__dataset = None
 
     def dataset(self) -> List[List]:
-        """Cached dataset
+        """
+        Load and cache the dataset if it hasn't been loaded yet.
+
+        Returns:
+            List[List]: The loaded dataset, where each row is a list of values.
         """
         if self.__dataset is None:
             with open(self.DATA_FILE) as f:

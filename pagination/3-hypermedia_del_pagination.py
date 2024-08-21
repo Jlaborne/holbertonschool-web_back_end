@@ -38,7 +38,8 @@ class Server:
 
     def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
         """
-        Returns a dictionary with pagination data for a dataset that may have deletions.
+        Returns a dictionary with pagination data for a dataset
+        that may have deletions.
 
         Args:
             index (int): The start index of the current page.
@@ -57,17 +58,17 @@ class Server:
         assert 0 <= index < len(indexed_dataset), "Index out of range"
 
         data = []
-        current_index = index
+        current_i = index
         collected = 0
 
         # Collect page_size items starting from the provided index
-        while collected < page_size and current_index < len(indexed_dataset):
-            if current_index in indexed_dataset:
-                data.append(indexed_dataset[current_index])
+        while collected < page_size and current_i < len(indexed_dataset):
+            if current_i in indexed_dataset:
+                data.append(indexed_dataset[current_i])
                 collected += 1
-            current_index += 1
+            current_i += 1
 
-        next_index = current_index if current_index < len(indexed_dataset) else None
+        next_index = current_i if current_i < len(indexed_dataset) else None
 
         return {
             'index': index,

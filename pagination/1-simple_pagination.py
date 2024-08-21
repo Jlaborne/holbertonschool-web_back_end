@@ -40,7 +40,7 @@ class Server:
         Load and cache the dataset if it hasn't been loaded yet.
 
         Returns:
-            List[List[str]]: The loaded dataset, where each row is a list of strings.
+            List[List[str]]: The loaded dataset.
         """
         if self.__dataset is None:
             with open(self.DATA_FILE, newline='') as f:

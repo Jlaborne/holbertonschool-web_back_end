@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Module that updates the topics of a school document based on the school name"""
+from pymongo import MongoClient
 
 
 def update_topics(mongo_collection, name, topics):

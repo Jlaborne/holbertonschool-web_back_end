@@ -11,7 +11,7 @@ def update_topics(mongo_collection, name, topics):
     :param name: The name of the school to update
     :param topics: A list of topics to set for the school
     """
-    mongo_collection.update_one(
+    mongo_collection.update.many(
         {"name": name},          # Filter by the school name
         {"$set": {"topics": topics}}  # Set the topics field to the new list
     )

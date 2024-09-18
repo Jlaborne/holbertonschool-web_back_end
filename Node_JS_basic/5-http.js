@@ -41,32 +41,36 @@ function countStudents(database) {
 
 // Create the HTTP server
 const app = http.createServer((req, res) => {
-  res.setHeader('Content-Type', 'text/plain');
-
-  if (req.url === '/') {
-    res.writeHead(200);
-    res.end('Hello Holberton School!');
-  } else if (req.url === '/students') {
-    const database = process.argv[2];
-    if (!database) {
-      res.writeHead(500);
-      res.end('Database not provided');
-      return;
-    }
-    countStudents(database)
-      .then((output) => {
-        res.writeHead(200);
-        res.end(`This is the list of our students\n${output}`);
-      })
-      .catch((err) => {
+    res.setHeader('Content-Type', 'text/plain');
+  
+    if (req.url === '/') {
+      const responseText = 'Hello Holberton School!';
+      res.setHeader('Content-Length', responseText.length);
+      res.writeHead(200);
+      res.end(responseText);
+    } else if (req.url === '/students') {
+      const database = process.argv[2];
+      if (!database) {
         res.writeHead(500);
-        res.end('Cannot load the database');
-      });
-  } else {
-    res.writeHead(404);
-    res.end('Not Found');
-  }
-});
+        res.end('Database not provided');
+        return;
+      }
+      countStudents(database)
+        .then((output) => {
+          const responseText = `This is the list of our students\n${output}`;
+          res.setHeader('Content-Length', responseText.length);
+          res.writeHead(200);
+          res.end(responseText);
+        })
+        .catch((err) => {
+          res.writeHead(500);
+          res.end('Cannot load the database');
+        });
+    } else {
+      res.writeHead(404);
+      res.end('Not Found');
+    }
+  });
 
 // Listen on port 1245
 app.listen(1245);

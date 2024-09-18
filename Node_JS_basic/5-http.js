@@ -1,82 +1,51 @@
 const http = require('http');
-const fs = require('fs');
-const { parse } = require('csv-parse');
+const { readFile } = require('fs').promises;
+const { argv } = process;
 
-// Function to count and list students from the CSV file
-function countStudents(database) {
-  return new Promise((resolve, reject) => {
-    const students = {};
-    let totalStudents = 0;
-
-    fs.readFile(database, (err, data) => {
-      if (err) {
-        reject(new Error('Cannot load the database'));
-        return;
-      }
-
-      const parser = parse(data, { delimiter: ',', from_line: 2 });
-      parser.on('data', (row) => {
-        // Ensure the row has at least 4 columns and both name and field are not empty
-        if (row.length > 3 && row[0].trim() && row[3].trim()) {
-          const field = row[3].trim();
-          if (!students[field]) {
-            students[field] = [];
-          }
-          students[field].push(row[0].trim());
-          totalStudents++;
-        }
-      });
-
-      parser.on('end', () => {
-        let output = `Number of students: ${totalStudents}\n`;
-        for (const [field, names] of Object.entries(students)) {
-          output += `Number of students in ${field}: ${names.length}. List: ${names.join(', ')}\n`;
-        }
-        resolve(output.trim());
-      });
-
-      parser.on('error', (error) => reject(error));
+const countStudents = async (path) => {
+  try {
+    const data = await readFile(path, 'utf8');
+    const lines = data.split('\n').filter(line => line.trim() !== '');
+    const students = lines.slice(1);
+    
+    const fields = {};
+    students.forEach(student => {
+      const [firstName, , , field] = student.split(',');
+      if (!fields[field]) fields[field] = [];
+      fields[field].push(firstName);
     });
-  });
-}
 
-// Create the HTTP server
-const app = http.createServer((req, res) => {
-  res.setHeader('Content-Type', 'text/plain');
-
-  if (req.url === '/') {
-    const responseText = 'Hello Holberton School!';
-    res.setHeader('Content-Length', responseText.length);
-    res.writeHead(200);
-    res.end(responseText);
-  } else if (req.url === '/students') {
-    const database = process.argv[2];
-    if (!database) {
-      res.writeHead(500);
-      res.end('Database not provided');
-      return;
+    let output = `Number of students: ${students.length}\n`;
+    for (const [field, names] of Object.entries(fields)) {
+      output += `Number of students in ${field}: ${names.length}. List: ${names.join(', ')}\n`;
     }
-    countStudents(database)
-      .then((output) => {
-        const responseText = `This is the list of our students\n${output}`;
-        res.setHeader('Content-Length', responseText.length);
-        res.writeHead(200);
-        res.end(responseText);
-      })
-      .catch((err) => {
-        res.writeHead(500);
-        res.end('Cannot load the database');
-      });
+    return output.trim();
+  } catch (error) {
+    throw new Error('Cannot load the database');
+  }
+};
+
+const app = http.createServer(async (req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  
+  if (req.url === '/') {
+    res.end('Hello Holberton School!');
+  } else if (req.url === '/students') {
+    try {
+      const databasePath = argv[2];
+      const studentsInfo = await countStudents(databasePath);
+      res.end(`This is the list of our students\n${studentsInfo}`);
+    } catch (error) {
+      res.end(`This is the list of our students\n${error.message}`);
+    }
   } else {
     res.writeHead(404);
     res.end('Not Found');
   }
 });
 
-// Listen on port 1245
 app.listen(1245, () => {
-  console.log('Server is running on http://localhost:1245');
+  console.log('Server running on port 1245');
 });
 
-// Export the app variable
 module.exports = app;

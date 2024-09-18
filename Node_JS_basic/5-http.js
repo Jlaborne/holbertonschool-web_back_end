@@ -16,7 +16,8 @@ function countStudents(database) {
 
       const parser = parse(data, { delimiter: ',', from_line: 2 });
       parser.on('data', (row) => {
-        if (row.length > 1 && row[0].trim() && row[3].trim()) {
+        // Ensure the row has at least 4 columns and both name and field are not empty
+        if (row.length > 3 && row[0].trim() && row[3].trim()) {
           const field = row[3].trim();
           if (!students[field]) {
             students[field] = [];
@@ -41,39 +42,41 @@ function countStudents(database) {
 
 // Create the HTTP server
 const app = http.createServer((req, res) => {
-    res.setHeader('Content-Type', 'text/plain');
-  
-    if (req.url === '/') {
-      const responseText = 'Hello Holberton School!';
-      res.setHeader('Content-Length', responseText.length);
-      res.writeHead(200);
-      res.end(responseText);
-    } else if (req.url === '/students') {
-      const database = process.argv[2];
-      if (!database) {
-        res.writeHead(500);
-        res.end('Database not provided');
-        return;
-      }
-      countStudents(database)
-        .then((output) => {
-          const responseText = `This is the list of our students\n${output}`;
-          res.setHeader('Content-Length', responseText.length);
-          res.writeHead(200);
-          res.end(responseText);
-        })
-        .catch((err) => {
-          res.writeHead(500);
-          res.end('Cannot load the database');
-        });
-    } else {
-      res.writeHead(404);
-      res.end('Not Found');
+  res.setHeader('Content-Type', 'text/plain');
+
+  if (req.url === '/') {
+    const responseText = 'Hello Holberton School!';
+    res.setHeader('Content-Length', responseText.length);
+    res.writeHead(200);
+    res.end(responseText);
+  } else if (req.url === '/students') {
+    const database = process.argv[2];
+    if (!database) {
+      res.writeHead(500);
+      res.end('Database not provided');
+      return;
     }
-  });
+    countStudents(database)
+      .then((output) => {
+        const responseText = `This is the list of our students\n${output}`;
+        res.setHeader('Content-Length', responseText.length);
+        res.writeHead(200);
+        res.end(responseText);
+      })
+      .catch((err) => {
+        res.writeHead(500);
+        res.end('Cannot load the database');
+      });
+  } else {
+    res.writeHead(404);
+    res.end('Not Found');
+  }
+});
 
 // Listen on port 1245
-app.listen(1245);
+app.listen(1245, () => {
+  console.log('Server is running on http://localhost:1245');
+});
 
 // Export the app variable
 module.exports = app;

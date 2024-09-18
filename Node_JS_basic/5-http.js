@@ -16,12 +16,12 @@ function countStudents(database) {
 
       const parser = parse(data, { delimiter: ',', from_line: 2 });
       parser.on('data', (row) => {
-        if (row.length > 1 && row[0].trim()) {
-          const field = row[3];
+        if (row.length > 1 && row[0].trim() && row[3].trim()) {
+          const field = row[3].trim();
           if (!students[field]) {
             students[field] = [];
           }
-          students[field].push(row[0]);
+          students[field].push(row[0].trim());
           totalStudents++;
         }
       });
@@ -48,6 +48,11 @@ const app = http.createServer((req, res) => {
     res.end('Hello Holberton School!');
   } else if (req.url === '/students') {
     const database = process.argv[2];
+    if (!database) {
+      res.writeHead(500);
+      res.end('Database not provided');
+      return;
+    }
     countStudents(database)
       .then((output) => {
         res.writeHead(200);
@@ -55,7 +60,7 @@ const app = http.createServer((req, res) => {
       })
       .catch((err) => {
         res.writeHead(500);
-        res.end(err.message);
+        res.end('Cannot load the database');
       });
   } else {
     res.writeHead(404);

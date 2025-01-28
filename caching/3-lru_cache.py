@@ -20,7 +20,7 @@ class LRUCache(BaseCaching):
             elif len(self.cache_data) >= BaseCaching.MAX_ITEMS:
                 # If the cache exceeds the max limit,
                 # remove the least recently used item
-                lru_key = self.order.pop(0)  
+                lru_key = self.order.pop(0)
                 # First key in order is the least recently used
                 del self.cache_data[lru_key]
                 print(f"DISCARD: {lru_key}")

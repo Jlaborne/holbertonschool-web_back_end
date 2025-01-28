@@ -18,7 +18,8 @@ class LIFOCache(BaseCaching):
                 # Remove the key from the order if it already exists
                 self.order.remove(key)
             elif len(self.cache_data) >= BaseCaching.MAX_ITEMS:
-                # If the cache exceeds the max limit, remove the first item added
+                # If the cache exceeds the max limit,
+                # remove the first item added
                 discarded = self.order.pop(-1)
                 del self.cache_data[discarded]
                 print(f"DISCARD: {discarded}")

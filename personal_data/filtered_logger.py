@@ -8,6 +8,8 @@ import logging
 import os
 import mysql.connector
 from mysql.connector import connection
+from datetime import datetime
+import bcrypt
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
@@ -88,9 +90,10 @@ def get_logger() -> logging.Logger:
 
     return
 
+
 def get_db() -> connection.MySQLConnection:
     """
-    Returns a MySQL database connection using credentials from environment variables.
+    Returns a MySQL database connection using credentials
     """
     db_config = {
         "user": os.getenv("PERSONAL_DATA_DB_USERNAME", "root"),
@@ -98,6 +101,34 @@ def get_db() -> connection.MySQLConnection:
         "host": os.getenv("PERSONAL_DATA_DB_HOST", "localhost"),
         "database": os.getenv("PERSONAL_DATA_DB_NAME")
     }
-    
+
     return mysql.connector.connect(**db_config)
 
+
+def hash_password(password: str) -> bytes:
+    """
+    Hashes a password using bcrypt and returns the hashed password
+    """
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode(), salt)
+
+
+def main():
+    """Main function to retrieve and log user data DB securely."""
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users;")
+    field_names = [i[0] for i in cursor.description]
+
+    logger = get_logger()
+
+    for row in cursor:
+        str_row = ''.join(f'{f}={str(r)}; ' for f, r in zip(field_names, row))
+        logger.info(str_row.strip())
+
+    cursor.close()
+    db.close()
+
+
+if __name__ == "__main__":
+    main()

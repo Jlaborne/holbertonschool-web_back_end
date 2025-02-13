@@ -5,6 +5,9 @@ Module for filtering sensitive personal data from log messages.
 import re
 from typing import List
 import logging
+import os
+import mysql.connector
+from mysql.connector import Error
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
@@ -84,3 +87,35 @@ def get_logger() -> logging.Logger:
     logger.addHandler(stream_handler)
 
     return
+
+def get_db():
+    """
+    Function to connect to the MySQL database using credentials from environment variables.
+    Returns:
+        A MySQL connection object.
+    """
+    try:
+        # Retrieve environment variables
+        db_username = os.environ.get("PERSONAL_DATA_DB_USERNAME", "root")
+        db_password = os.environ.get("PERSONAL_DATA_DB_PASSWORD", "")
+        db_host = os.environ.get("PERSONAL_DATA_DB_HOST", "localhost")
+        db_name = os.environ.get("PERSONAL_DATA_DB_NAME")
+
+        # Connect to the database
+        connection = mysql.connector.connect(
+            host=db_host,
+            user=db_username,
+            password=db_password,
+            database=db_name
+        )
+        
+        # Check if the connection was successful
+        if connection.is_connected():
+            print(f"Connected to the database {db_name} successfully.")
+            return connection
+        else:
+            print("Failed to connect to the database.")
+            return None
+    except Error as e:
+        print(f"Error while connecting to MySQL: {e}")
+        return None

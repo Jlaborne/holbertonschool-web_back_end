@@ -7,7 +7,7 @@ from typing import List
 import logging
 import os
 import mysql.connector
-from mysql.connector import Error
+from mysql.connector import connection
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
@@ -88,34 +88,16 @@ def get_logger() -> logging.Logger:
 
     return
 
-def get_db():
+def get_db() -> connection.MySQLConnection:
     """
-    Function to connect to the MySQL database using credentials from environment variables.
-    Returns:
-        A MySQL connection object.
+    Returns a MySQL database connection using credentials from environment variables.
     """
-    try:
-        # Retrieve environment variables
-        db_username = os.environ.get("PERSONAL_DATA_DB_USERNAME", "root")
-        db_password = os.environ.get("PERSONAL_DATA_DB_PASSWORD", "")
-        db_host = os.environ.get("PERSONAL_DATA_DB_HOST", "localhost")
-        db_name = os.environ.get("PERSONAL_DATA_DB_NAME")
+    db_config = {
+        "user": os.getenv("PERSONAL_DATA_DB_USERNAME", "root"),
+        "password": os.getenv("PERSONAL_DATA_DB_PASSWORD", ""),
+        "host": os.getenv("PERSONAL_DATA_DB_HOST", "localhost"),
+        "database": os.getenv("PERSONAL_DATA_DB_NAME")
+    }
+    
+    return mysql.connector.connect(**db_config)
 
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=db_host,
-            user=db_username,
-            password=db_password,
-            database=db_name
-        )
-        
-        # Check if the connection was successful
-        if connection.is_connected():
-            print(f"Connected to the database {db_name} successfully.")
-            return connection
-        else:
-            print("Failed to connect to the database.")
-            return None
-    except Error as e:
-        print(f"Error while connecting to MySQL: {e}")
-        return None

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """ DocDocDocDocDocDoc
 """
-
 from typing import List, TypeVar
 from flask import request
 
@@ -9,6 +8,8 @@ User = TypeVar('User')
 
 
 class Auth:
+    """ Class to manage the API authentication """
+
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
         """
         Determines if authentication is required for a given path.

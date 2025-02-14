@@ -32,4 +32,4 @@ def unauthorized():
     Return:
       - An error 401
     """
-    abort(401)
+    abort(401, "Unauthorized")

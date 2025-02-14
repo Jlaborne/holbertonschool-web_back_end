@@ -26,6 +26,8 @@ class Auth:
         if path in excluded_paths:
             return False
 
+        return True
+
     def authorization_header(self, request=None) -> str:
         """
         Retrieves the Authorization header from the Flask request object.

@@ -34,16 +34,6 @@ class SessionAuth(Auth):
         user_id = self.user_id_by_session_id.get(session_id)
         return user_id
 
-    def session_cookie(self, request=None):
-        """
-        Retrieves the session ID from the request cookies.
-
-        Returns:
-            The session ID as a string if present; otherwise, None.
-        """
-        if request is None:
-            return None
-
         session_name = getenv("SESSION_NAME")
 
         if not session_name:

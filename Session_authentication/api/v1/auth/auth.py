@@ -44,3 +44,13 @@ class Auth:
         Currently returns None; to be implemented later.
         """
         return None
+
+    def session_cookie(self, request=None):
+        """
+        Retrieves the session ID from the request cookies.
+
+        Returns:
+            The session ID as a string if present; otherwise, None.
+        """
+        if request is None:
+            return None

@@ -3,7 +3,6 @@
 
 from api.v1.auth.auth import Auth
 from uuid import uuid4
-from os import getenv
 
 
 class SessionAuth(Auth):
@@ -33,11 +32,3 @@ class SessionAuth(Auth):
 
         user_id = self.user_id_by_session_id.get(session_id)
         return user_id
-
-        session_name = getenv("SESSION_NAME")
-
-        if not session_name:
-            return None
-
-        session_id = request.cookies.get(session_name)
-        return session_id

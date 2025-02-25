@@ -46,9 +46,13 @@ class DB:
         Finds user by keyword arguments
         Return: First row found in the users table as filtered by kwargs
         """
-        try:
-            return self._session.query(User).filter_by(**kwargs).first()
-        except NoResultFound:
+        valid_columns = User.__table__.columns.keys()
+        for key in kwargs.keys():
+            if key not in valid_columns:
+                raise InvalidRequestError(f"Invalid column name: {key}")
+
+        user = self._session.query(User).filter_by(**kwargs).first()
+        if user is None:
             raise NoResultFound("No user found with the given criteria.")
-        except InvalidRequestError:
-            raise InvalidRequestError("Invalid query arguments.")
+
+        return user

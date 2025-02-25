@@ -64,12 +64,9 @@ class DB:
         user = self.find_user_by(id=user_id)
 
         valid_columns = User.__table__.columns.keys()
-        for key in kwargs.keys():
+        for key, value in kwargs.items():
             if key not in valid_columns:
                 raise ValueError(
                     f"{key} is not a valid column in the users table")
-
-        for key, value in kwargs.items():
             setattr(user, key, value)
-
         self._session.commit()

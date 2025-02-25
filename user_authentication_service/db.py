@@ -42,7 +42,7 @@ class DB:
         return new_user
 
     def find_user_by(self, **kwargs) -> User:
-        """ 
+        """
         Finds user by keyword arguments
         Return: First row found in the users table as filtered by kwargs
         """
@@ -56,3 +56,20 @@ class DB:
             raise NoResultFound("No user found with the given criteria.")
 
         return user
+
+    def update_user(self, user_id: int, **kwargs: str) -> None:
+        """
+        Update user
+        """
+        user = self.find_user_by(id=user_id)
+
+        valid_columns = User.__table__.columns.keys()
+        for key in kwargs.keys():
+            if key not in valid_columns:
+                raise ValueError(
+                    f"{key} is not a valid column in the users table")
+
+        for key, value in kwargs.items():
+            setattr(user, key, value)
+
+        self._session.commit()

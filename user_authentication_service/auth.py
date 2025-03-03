@@ -65,3 +65,41 @@ class Auth:
             return user
         except NoResultFound:
             return None
+
+    def destroy_session(self, user_id: int) -> None:
+        """Update the current user id to None"""
+        if not user_id:
+            return None
+        try:
+            found_user = self._db.find_user_by(id=user_id)
+            self._db.update_user(found_user.id, session_id=None)
+        except NoResultFound:
+            return None
+
+    def get_reset_password_token(self, email: str) -> str:
+        """
+        If it exists, generate a UUID and
+        update the user’s reset_token database field
+        Return: the token
+        """
+        try:
+            user = self._db.find_user_by(email=email)
+        except NoResultFound:
+            raise ValueError
+
+        reset_token = _generate_uuid()
+
+        self._db.update_user(user.id, reset_token=reset_token)
+
+        return reset_token
+
+    def update_password(self, reset_token: str, new_password: str) -> str:
+        """Update a user's password if the reset token is valid."""
+        try:
+            user = self._db.find_user_by(reset_token=reset_token)
+            hashed_password = self._hash_password(new_password)
+            self._db.update_user(
+                user.id, hashed_password=hashed_password, reset_token=None)
+            return user.email
+        except NoResultFound:
+            raise ValueError("Invalid reset token")

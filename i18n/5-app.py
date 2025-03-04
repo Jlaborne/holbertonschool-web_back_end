@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """
 Flask app with Babel, forced locale, and mock login system.
-
-This application supports language selection via URL parameters and mocks user authentication.
 """
 
 from flask import Flask, render_template, request, g
@@ -55,7 +53,6 @@ def before_request() -> None:
     """
     Executed before handling any request.
 
-    If `login_as` is provided in the URL, retrieve the user and store it in `g.user`.
     """
     g.user = get_user()
 
@@ -65,7 +62,6 @@ def get_locale() -> str:
     Determine the best match for supported languages.
 
     - If a `locale` query parameter is present and valid, use it.
-    - Otherwise, use the best match from the request's `Accept-Language` headers.
 
     Returns:
         str: The chosen locale.

@@ -35,6 +35,7 @@ def index():
 
 @app.context_processor
 def inject_locale():
+    """Determine the best match for supported lang"""
     return {"get_locale": get_locale}
 
 

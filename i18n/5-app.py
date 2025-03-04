@@ -1,32 +1,11 @@
 #!/usr/bin/env python3
-"""
-Flask app with Babel, forced locale, and mock login system.
-"""
-
+"""Simple flask app setup"""
 from flask import Flask, render_template, request, g
-from flask_babel import Babel, _
-
-
-class Config:
-    """
-    Configuration class for Flask app.
-
-    Attributes:
-        LANGUAGES (list): List of supported languages.
-        BABEL_DEFAULT_LOCALE (str): Default locale set to English.
-        BABEL_DEFAULT_TIMEZONE (str): Default timezone set to UTC.
-    """
-    LANGUAGES = ["en", "fr"]
-    BABEL_DEFAULT_LOCALE = "en"
-    BABEL_DEFAULT_TIMEZONE = "UTC"
-
-
+from flask_babel import Babel, _ as get_translation
 app = Flask(__name__)
-app.config.from_object(Config)
+babel = Babel(app)
 
-babel = Babel()
 
-# Mock user database
 users = {
     1: {"name": "Balou", "locale": "fr", "timezone": "Europe/Paris"},
     2: {"name": "Beyonce", "locale": "en", "timezone": "US/Central"},
@@ -35,71 +14,48 @@ users = {
 }
 
 
-def get_user() -> dict | None:
-    """
-    Retrieve user information based on the `login_as` parameter.
+class Config(object):
+    """Class to set defualts for babel"""
+    LANGUAGES = ["en", "fr"]
+    Babel.default_locale = "en"
+    Babel.default_timezone = "UTC"
 
-    Returns:
-        dict | None: User dictionary if found, otherwise None.
-    """
-    user_id = request.args.get("login_as")
-    if user_id and user_id.isdigit():
+
+app.config.from_object(Config)
+
+
+@babel.localeselector
+def get_locale():
+    """Get best langauge for user"""
+    locale = request.args.get('locale')
+    if locale and locale in Config.LANGUAGES:
+        return locale
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
+
+
+@app.route('/')
+def index():
+    """Return simple homepage"""
+    if g.user:
+        login_msg = get_translation('logged_in_as', username=g.user['name'])
+    else:
+        login_msg = get_translation('not_logged_in')
+    return render_template('5-index.html', login_msg=login_msg)
+
+
+def get_user():
+    """get_user returns a user dictionary or None"""
+    user_id = request.args.get('login_as')
+    if user_id:
         return users.get(int(user_id))
+
     return None
 
 
 @app.before_request
-def before_request() -> None:
-    """
-    Executed before handling any request.
-
-    """
+def before_request():
+    """find a user if any, and set it as a global"""
     g.user = get_user()
-
-
-def get_locale() -> str:
-    """
-    Determine the best match for supported languages.
-
-    - If a `locale` query parameter is present and valid, use it.
-
-    Returns:
-        str: The chosen locale.
-    """
-    locale = request.args.get("locale")
-    if locale and locale in app.config["LANGUAGES"]:
-        return locale
-
-    # If the user is logged in, use their locale preference if available
-    if g.get("user") and g.user.get("locale") in app.config["LANGUAGES"]:
-        return g.user["locale"]
-
-    return request.accept_languages.best_match(app.config["LANGUAGES"])
-
-
-babel.init_app(app, locale_selector=get_locale)
-
-
-@app.route('/')
-def index() -> str:
-    """
-    Render the homepage with translated content.
-
-    Returns:
-        str: Rendered HTML template.
-    """
-    return render_template('5-index.html')
-
-
-@app.context_processor
-def inject_locale() -> dict:
-    """
-    Make `get_locale` function available inside Jinja templates.
-
-    Returns:
-        dict: Dictionary containing the `get_locale` function.
-    """
-    return {"get_locale": get_locale}
 
 
 if __name__ == '__main__':

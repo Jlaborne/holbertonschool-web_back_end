@@ -2,8 +2,6 @@
 """
 Flask app with Babel and forced locale via URL parameter.
 
-This application allows users to specify a locale using a URL parameter (?locale=fr or ?locale=en).
-If the locale is not provided or is unsupported, it defaults to the best match from the request headers.
 """
 
 from flask import Flask, render_template, request
@@ -35,7 +33,6 @@ def get_locale() -> str:
     Determine the best match for supported languages.
 
     - If a `locale` query parameter is present and valid, use it.
-    - Otherwise, use the best match from the request's `Accept-Language` headers.
 
     Returns:
         str: The chosen locale.

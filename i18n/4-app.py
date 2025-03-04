@@ -1,22 +1,11 @@
 #!/usr/bin/env python3
-"""
-Flask app with Babel and forced locale via URL parameter.
-
-"""
-
+"""API Basic Flask app with Babel and locale selection with URL parameter"""
 from flask import Flask, render_template, request
-from flask_babel import Babel, _
+from flask_babel import Babel, get_locale
 
 
-class Config:
-    """
-    Configuration class for Flask app.
-
-    Attributes:
-        LANGUAGES (list): List of supported languages.
-        BABEL_DEFAULT_LOCALE (str): Default locale set to English.
-        BABEL_DEFAULT_TIMEZONE (str): Default timezone set to UTC.
-    """
+class Config():
+    """Define the Config class for Babel translation"""
     LANGUAGES = ["en", "fr"]
     BABEL_DEFAULT_LOCALE = "en"
     BABEL_DEFAULT_TIMEZONE = "UTC"
@@ -25,49 +14,30 @@ class Config:
 app = Flask(__name__)
 app.config.from_object(Config)
 
-babel = Babel()
-
 
 def get_locale() -> str:
+    """Determine the best match with our supported languages or
+        use locale parameter from URL.
     """
-    Determine the best match for supported languages.
+    # Check if 'locale' parameter is present in the query string
+    locale_param = request.args.get('locale')
 
-    - If a `locale` query parameter is present and valid, use it.
+    # If 'locale' is present and is a supported language, return it
+    if locale_param in app.config['LANGUAGES']:
+        return locale_param
 
-    Returns:
-        str: The chosen locale.
-    """
-    locale = request.args.get('locale')
-    if locale and locale in app.config["LANGUAGES"]:
-        return locale  # Force locale via URL parameter
-
-    return request.accept_languages.best_match(app.config["LANGUAGES"])
+    # Otherwise, return the best match based on the browser's accepted lang.
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
-babel.init_app(app, locale_selector=get_locale)
+babel = Babel(app, locale_selector=get_locale)
 
 
 @app.route('/')
 def index() -> str:
-    """
-    Render the homepage with translated content.
-
-    Returns:
-        str: Rendered HTML template.
-    """
+    """Return the homepage index when the application startup"""
     return render_template('4-index.html')
 
 
-@app.context_processor
-def inject_locale() -> dict:
-    """
-    Make `get_locale` function available inside Jinja templates.
-
-    Returns:
-        dict: Dictionary containing the `get_locale` function.
-    """
-    return {"get_locale": get_locale}
-
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "mocha": "^11.1.0"
+  },
+  "name": "unittests_in_js",
+  "version": "1.0.0",
+  "main": "0-calcul.test.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

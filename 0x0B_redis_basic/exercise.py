@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Basic Redis cache with method call counting"""
+
+"""Basic Redis cache with method call counting and replay functionality.
+
+This module defines a Cache class that wraps Redis for caching and
+tracking method calls using decorators. It supports counting, history logging,
+and replaying method calls with parameters and outputs.
+"""
+
 
 import redis
 import uuid

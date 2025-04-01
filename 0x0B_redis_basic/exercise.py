@@ -33,7 +33,7 @@ def count_calls(method: Callable) -> Callable:
     return wrapper
 
 
-def replay(method: Callable):
+def replay(method: Callable) -> Callable:
     """Display the history of calls of a function."""
     r = redis.Redis()
     method_name = method.__qualname__

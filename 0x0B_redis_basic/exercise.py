@@ -65,8 +65,10 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str, fn: Optional[Callable] = None) -> Union[bytes, str, int, None]:
-        """Retrieve data from Redis and optionally apply a conversion function"""
+    def get(self,
+            key: str,
+            fn: Optional[Callable] = None) -> Union[bytes, str, int, None]:
+        """Get data from Redis and optionally apply a conversion function"""
         data = self._redis.get(key)
         if data is None:
             return None
